@@ -11,14 +11,15 @@ export default function App() {
   /* ユーザーのパブリックウォレットを保存するために使用する状態変数を定義します */
   const [currentAccount, setCurrentAccount] = useState("");
   /* ユーザーのメッセージを保存するために使用する状態変数を定義 */
-  const [messageValue, setMessageValue] = useState("");
+  //const [messageValue, setMessageValue] = useState("");
   /* すべてのwavesを保存する状態変数を定義 */
   const [allWaves, setAllWaves] = useState([]);
+  //const [result, setResult] = useState();
   console.log("currentAccount: ", currentAccount);
   /**
    * デプロイされたコントラクトのアドレスを保持する変数を作成
    */
-  const contractAddress = "0x1db7A5f4D661c4b30ACF2798397242a7A3DdF0f3";
+  const contractAddress = "0xb90B24315d47f1EF2cBA2942dcBb5765061F116e";
   /**
    * ABIの内容を参照する変数を作成
    */
@@ -43,7 +44,7 @@ export default function App() {
           return {
             address: wave.waver,
             timestamp: new Date(wave.timestamp * 1000),
-            message: wave.message,
+            result: wave.result,
           };
         });
 
@@ -63,14 +64,14 @@ export default function App() {
   useEffect(() => {
     let wavePortalContract;
 
-    const onNewWave = (from, timestamp, message) => {
-      console.log("NewWave", from, timestamp, message);
+    const onNewWave = (from, timestamp, result) => {
+      console.log("NewWave", from, timestamp, result);
       setAllWaves((prevState) => [
         ...prevState,
         {
           address: from,
           timestamp: new Date(timestamp * 1000),
-          message: message,
+          result: result,
         },
       ]);
     };
@@ -112,6 +113,7 @@ export default function App() {
         const account = accounts[0];
         console.log("Found an authorized account:", account);
         setCurrentAccount(account);
+        getAllWaves();
       } else {
         console.log("No authorized account found");
       }
@@ -162,7 +164,7 @@ export default function App() {
         /*
          * コントラクトに👋（wave）を書き込む。ここから...
          */
-        const waveTxn = await wavePortalContract.wave(messageValue, {
+        const waveTxn = await wavePortalContract.wave({
           gasLimit: 300000,
         });
         console.log("Mining...", waveTxn.hash);
@@ -205,22 +207,23 @@ export default function App() {
       <div className="dataContainer">
         <div className="header">
           <span role="img" aria-label="hand-wave">
-            👋
+            ⛩️
           </span>{" "}
-          WELCOME!
+          Unchain神社
         </div>
         <div className="bio">
           イーサリアムウォレットを接続して、「
           <span role="img" aria-label="hand-wave">
-            👋
+            🙏
           </span>
-          (wave)」を送ってください
+          (お祈り)」をしてください
           <span role="img" aria-label="shine">
             ✨
           </span>
+          <div>大吉0.0001eth 中吉0.00005eth 小吉0.00001eth 大凶0eth</div>
         </div>
         {/* メッセージボックスを実装*/}
-        {currentAccount && (
+        {/* {currentAccount && (
           <textarea
             name="messageArea"
             placeholder="メッセージはこちら"
@@ -229,7 +232,7 @@ export default function App() {
             value={messageValue}
             onChange={(e) => setMessageValue(e.target.value)}
           />
-        )}
+        )} */}
         {/* ウォレットコネクトのボタンを実装 */}
         {!currentAccount && (
           <button className="waveButton" onClick={connectWallet}>
@@ -244,9 +247,20 @@ export default function App() {
         {/* waveボタンにwave関数を連動 */}
         {currentAccount && (
           <button className="waveButton" onClick={wave}>
-            Wave at Me
+            🙏（お祈り）でクリプト神の御言葉とETHをいただく
           </button>
         )}
+        {/* {currentAccount && (
+          <div
+            style={{
+              backgroundColor: "#F8F8FF",
+              marginTop: "16px",
+              padding: "8px",
+            }}
+          >
+            <div>結果: {allWaves.slice(0).reverse().result}</div>
+          </div>
+        )} */}
         {/* 履歴を表示する */}
         {currentAccount &&
           allWaves
@@ -264,7 +278,7 @@ export default function App() {
                 >
                   <div>Address: {wave.address}</div>
                   <div>Time: {wave.timestamp.toString()}</div>
-                  <div>Message: {wave.message}</div>
+                  <div>result: {wave.result}</div>
                 </div>
               );
             })}
